@@ -1,0 +1,79 @@
+{
+  "name": "mindlm-mcp",
+  "version": "0.1.0",
+  "description": "MCP server + CLI that turns text, web pages and PDFs into interactive mind maps (Markdown outline → standalone markmap HTML). Zero API key required.",
+  "type": "module",
+  "license": "MIT",
+  "author": "青澈君",
+  "homepage": "https://mindlm.io/?utm_source=npm&utm_medium=referral&utm_campaign=mindlm-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qingchejun/mindlm-io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qingchejun/mindlm-io/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "mindmap",
+    "mind-map",
+    "markmap",
+    "pdf-to-mindmap",
+    "url-to-mindmap",
+    "text-to-mindmap",
+    "outline",
+    "claude",
+    "cursor",
+    "cli",
+    "mindlm"
+  ],
+  "mcpName": "io.github.qingchejun/mindlm-mcp",
+  "bin": {
+    "mindlm-mcp": "dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.1.0",
+    "@mozilla/readability": "^0.6.0",
+    "commander": "^15.0.0",
+    "d3": "^7.9.0",
+    "linkedom": "^0.18.13",
+    "markmap-common": "^0.18.9",
+    "markmap-lib": "^0.18.12",
+    "markmap-render": "^0.18.12",
+    "markmap-toolbar": "^0.18.12",
+    "markmap-view": "^0.18.12",
+    "open": "^11.0.4",
+    "unpdf": "^1.8.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
+    "@modelcontextprotocol/client": "^2.1.0",
+    "@types/node": "^22.20.4",
+    "@vitest/coverage-v8": "^5.0.2",
+    "publint": "^0.3.24",
+    "tsdown": "^0.23.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  }
+}
