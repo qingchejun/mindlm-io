@@ -13,14 +13,12 @@ import {
 import { textToDocument } from './extract/text.js';
 import { fetchUrlDocument, type UrlOptions, type UrlSource } from './extract/url.js';
 import type { Document } from './outline/blocks.js';
-import { countChars } from './outline/blocks.js';
+import { type OutlineStats, outlineStats } from './outline/generate.js';
 import { heuristicOutline } from './outline/heuristic.js';
 import {
-  countNodes,
   DEFAULT_MAX_CHILDREN,
   DEFAULT_MAX_DEPTH,
   type Outline,
-  outlineDepth,
   outlineToMarkdown,
 } from './outline/normalize.js';
 import { renderMindmapHtml } from './render/html.js';
@@ -32,9 +30,24 @@ export { parsePageRange, pdfBytesToDocument, pdfFileToDocument } from './extract
 export { looksLikeMarkdown, textToDocument } from './extract/text.js';
 export type { UrlFetchResult, UrlSource } from './extract/url.js';
 export { fetchUrlDocument } from './extract/url.js';
+export { completeWithAnthropic } from './llm/anthropic.js';
+export type { LlmConfig, LlmOverrides, Provider } from './llm/config.js';
+export { describeConfig, resolveLlmConfig } from './llm/config.js';
+export { completeWithOpenAi } from './llm/openai-compatible.js';
+export type { CompletionOptions } from './llm/types.js';
+export { serveMindlmStdio } from './mcp/serve.js';
+export { createMindlmServer, TOOL_NAMES } from './mcp/server.js';
 export type { Block, Document } from './outline/blocks.js';
 export { blocksToText, compactBlocks } from './outline/blocks.js';
+export type { ClientModePayload } from './outline/client-mode.js';
+export { clientModePayload } from './outline/client-mode.js';
+export type { GeneratedOutline, GenerateOptions, OutlineStats } from './outline/generate.js';
+export { generateOutline, outlineStats } from './outline/generate.js';
 export { heuristicOutline } from './outline/heuristic.js';
+export type { LlmOutlineOptions, LlmOutlineResult } from './outline/llm.js';
+export { llmOutline } from './outline/llm.js';
+export type { OutlineMode, RequestedMode, Surface } from './outline/mode.js';
+export { CLI_MODES, MCP_MODES, resolveMode } from './outline/mode.js';
 export type { Outline, OutlineNode } from './outline/normalize.js';
 export {
   normalizeOutline,
@@ -42,8 +55,13 @@ export {
   outlineToMarkdown,
   parseOutlineMarkdown,
 } from './outline/normalize.js';
+export { buildOutlinePrompt, outlineRules, SYSTEM_PROMPT } from './outline/prompts.js';
+export type { ExportOptions, ExportResult } from './render/export.js';
+export { exportMindmap } from './render/export.js';
 export type { RenderOptions, RenderResult } from './render/html.js';
 export { renderMindmapHtml } from './render/html.js';
+export type { WriteResult } from './render/output.js';
+export { resolveOutputPath, slugify, writeOutputFile } from './render/output.js';
 export { describeError, MindlmError } from './util/errors.js';
 export { VERSION } from './util/version.js';
 
@@ -51,13 +69,6 @@ export interface OutlineOptions {
   title?: string;
   maxDepth?: number;
   maxChildren?: number;
-}
-
-export interface OutlineStats {
-  inputChars: number;
-  nodes: number;
-  depth: number;
-  truncated: boolean;
 }
 
 export interface OutlineResult {
@@ -87,12 +98,7 @@ export function outlineFromDocument(
     title: outline.title,
     markdown: outlineToMarkdown(outline),
     outline,
-    stats: {
-      inputChars: countChars(document.blocks),
-      nodes: countNodes(outline),
-      depth: outlineDepth(outline),
-      truncated: document.truncated,
-    },
+    stats: outlineStats(document, outline),
   };
 }
 
