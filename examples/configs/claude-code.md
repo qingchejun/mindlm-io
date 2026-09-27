@@ -29,9 +29,9 @@ Copy [`claude-desktop.json`](./claude-desktop.json) into your config file and re
 ## Cursor
 
 Copy [`cursor.json`](./cursor.json) into `~/.cursor/mcp.json` (global) or `.cursor/mcp.json`
-(one project). It is the same file with the optional LLM variables filled in — delete the
-`ANTHROPIC_API_KEY` and `MINDMAP_LLM_MODEL` lines unless you want the server to call a model
-itself, and never commit a real key.
+(one project). It is zero-key like the others; to let the server call a model itself, add
+`"ANTHROPIC_API_KEY": "<your-key>"` (and optionally `MINDMAP_LLM_MODEL`) to its `env` block —
+and never commit a real key.
 
 ## Optional environment variables
 

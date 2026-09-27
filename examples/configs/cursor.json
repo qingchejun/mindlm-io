@@ -4,9 +4,7 @@
       "command": "npx",
       "args": ["-y", "mindlm-mcp", "serve"],
       "env": {
-        "MINDMAP_OUTPUT_DIR": "~/Documents/mindmaps",
-        "ANTHROPIC_API_KEY": "<your-key>",
-        "MINDMAP_LLM_MODEL": "claude-sonnet-5"
+        "MINDMAP_OUTPUT_DIR": "~/Documents/mindmaps"
       }
     }
   }
