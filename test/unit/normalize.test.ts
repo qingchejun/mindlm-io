@@ -57,6 +57,30 @@ describe('outlineFromBlocks', () => {
     expect(outline.children[0]?.children[0]?.text).toBe('One. Two.');
   });
 
+  it('keeps sections under the root when prose comes before the first heading', () => {
+    const outline = outlineFromBlocks(
+      [
+        paragraph('A lead paragraph that precedes every section.'),
+        heading(2, 'First section'),
+        paragraph('Inside the first section.'),
+        heading(2, 'Second section'),
+        heading(2, 'Third section'),
+      ],
+      { title: 'T', paragraphs: 'firstSentence' },
+    );
+
+    // The lead is a sibling of the sections, not their parent.
+    expect(outline.children.map((child) => child.text)).toEqual([
+      'A lead paragraph that precedes every section.',
+      'First section',
+      'Second section',
+      'Third section',
+    ]);
+    expect(outline.children[1]?.children).toEqual([
+      { text: 'Inside the first section.', children: [] },
+    ]);
+  });
+
   it('nests list items below the current heading', () => {
     const outline = outlineFromBlocks(
       [heading(2, 'S'), listItem(0, 'a'), listItem(1, 'a1'), listItem(0, 'b')],
@@ -121,6 +145,27 @@ describe('normalizeOutline', () => {
   it('always produces a root title', () => {
     expect(normalizeOutline({ title: '   ', children: [] }).title).toBe('Mind map');
   });
+
+  it('lifts the sections out of a lone child that repeats the title', () => {
+    const result = normalizeOutline({
+      title: 'Photosynthesis: A Short Primer',
+      children: [node('Photosynthesis: A Short Primer', [node('1. Overview'), node('2. Inputs')])],
+    });
+    expect(result.children.map((child) => child.text)).toEqual(['1. Overview', '2. Inputs']);
+  });
+
+  it('drops a leaf that only repeats the title', () => {
+    const result = normalizeOutline({
+      title: 'Photosynthesis: A Short Primer',
+      children: [node('photosynthesis: a short primer'), node('1. Overview')],
+    });
+    expect(result.children.map((child) => child.text)).toEqual(['1. Overview']);
+  });
+
+  it('keeps the echo rather than returning an empty mind map', () => {
+    const result = normalizeOutline({ title: 'Only', children: [node('Only')] });
+    expect(result.children.map((child) => child.text)).toEqual(['Only']);
+  });
 });
 
 describe('countNodes / outlineDepth', () => {
@@ -143,13 +188,34 @@ describe('outlineToMarkdown', () => {
     );
   });
 
-  it('escapes text that would otherwise start Markdown structure', () => {
+  it('leaves heading lines unescaped: nothing there can start a block', () => {
     const markdown = outlineToMarkdown({
-      title: '# not a heading',
-      children: [node('1. not a list')],
+      title: 'Photosynthesis: A Short Primer',
+      children: [node('1. Overview', [node('2.1 Inputs')])],
     });
-    expect(markdown).toContain('\\# not a heading');
-    expect(markdown).toContain('\\1. not a list');
+    expect(markdown).toContain('## 1. Overview');
+    expect(markdown).toContain('### 2.1 Inputs');
+    expect(markdown).not.toContain('\\');
+  });
+
+  it('escapes a list delimiter, which would otherwise nest a list', () => {
+    const markdown = outlineToMarkdown({
+      title: 'Root',
+      children: [node('A', [node('a1', [node('1. numbered'), node('- bulleted')])])],
+    });
+    expect(markdown).toContain('- 1\\. numbered');
+    expect(markdown).toContain('- \\- bulleted');
+  });
+
+  it('escapes only the markers Markdown would actually read', () => {
+    const markdown = outlineToMarkdown({
+      title: 'Root',
+      children: [node('a `code` span'), node('[edit]'), node('[label](http://x)')],
+    });
+    // A lone bracket pair is literal text; a link is not.
+    expect(markdown).toContain('## [edit]');
+    expect(markdown).toContain('\\[label\\]');
+    expect(markdown).toContain('a \\`code\\` span');
   });
 
   it('round-trips through the parser', () => {
