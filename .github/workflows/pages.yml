@@ -1,0 +1,65 @@
+name: Pages
+
+# The site is the hand-written HTML in docs/, plus docs/demo/, which is generated
+# here from examples/*.md by the freshly built renderer and never committed.
+#
+# One manual step is needed once: repository Settings → Pages → Source →
+# "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'examples/**'
+      - 'src/render/**'
+      - 'scripts/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment at a time; let a newer push finish rather than cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Generate the embedded demo
+        run: node scripts/gen-demo.mjs
+
+      - name: Check outbound links
+        run: node scripts/check-pages-links.mjs
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

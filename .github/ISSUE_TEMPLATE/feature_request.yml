@@ -1,0 +1,39 @@
+name: Feature request
+description: Suggest something the tool should do
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This project is deliberately small: text, URLs and PDFs in, an outline and one
+        standalone HTML file out. Ideas that keep it that way have the best odds.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do, and where does the tool get in the way?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like it to do
+      description: A concrete shape helps — a flag, a tool argument, an output format.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you tried instead
+      description: Workarounds, other tools, or why the existing options do not fit.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: This does not require a hosted service, an account, or telemetry
+        - label: This does not require an API key to be useful

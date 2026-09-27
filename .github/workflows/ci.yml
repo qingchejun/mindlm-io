@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.x', '24.x']
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm test
+
+      - run: npm run build
+
+      - name: publint
+        run: |
+          if [ -d node_modules/publint ]; then
+            npx --no publint
+          else
+            echo "publint is not installed — skipping"
+          fi
+
+      # The published tarball must be dist + README + LICENSE and nothing else:
+      # no tests, no .env, no source, no docs.
+      - name: Check package contents
+        run: |
+          npm pack --dry-run --json > pack.json
+          node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            const files = JSON.parse(readFileSync("pack.json", "utf8"))[0].files.map((f) => f.path);
+            const allowed = /^(dist\/|README\.md$|LICENSE$|package\.json$)/;
+            const bad = files.filter((f) => !allowed.test(f));
+            console.log(files.map((f) => "  " + f).join("\n"));
+            if (bad.length > 0) {
+              console.error("Unexpected files in the package tarball:\n" + bad.join("\n"));
+              process.exit(1);
+            }
+            console.log(`ok — ${files.length} files, all expected`);
+          '
+          rm -f pack.json
+
+      - name: Smoke test the CLI
+        run: |
+          node dist/cli.js demo --no-open -o /tmp/demo.html
+          test -s /tmp/demo.html
+          # An offline export must not reach for the network at open time.
+          if grep -q '<script[^>]*src="http' /tmp/demo.html; then
+            echo "::error::the offline demo export links a remote script"
+            exit 1
+          fi
+
+      - name: Check Pages links
+        run: npm run check:links
+
+      # Red lines from the plan: src/ never mentions the website (except the one
+      # opt-in branding href) and never mentions any backend service.
+      - name: Red-line grep
+        run: |
+          status=0
+
+          hits=$(grep -rn 'mindlm\.io' src || true)
+          offenders=$(printf '%s\n' "$hits" | grep -v '^src/render/branding\.ts:' | grep . || true)
+          if [ -n "$offenders" ]; then
+            echo "::error::mindlm.io may only appear in src/render/branding.ts"
+            printf '%s\n' "$offenders"
+            status=1
+          fi
+
+          supabase=$(grep -rni 'supabase' src || true)
+          if [ -n "$supabase" ]; then
+            echo "::error::supabase must not appear anywhere in src/"
+            printf '%s\n' "$supabase"
+            status=1
+          fi
+
+          if [ "$status" -eq 0 ]; then echo "ok — no red-line strings in src/"; fi
+          exit $status
+
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # gitleaks scans history, so it needs all of it.
+          fetch-depth: 0
+
+      # The binary is used directly rather than gitleaks-action, whose
+      # organisation licensing requirements we have not verified.
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: 8.30.1
+        # Installed outside the checkout so the binary is not itself scanned.
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl --fail --silent --show-error --location -o "$tarball" "$base/$tarball"
+          curl --fail --silent --show-error --location -o checksums.txt \
+            "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          # TODO(hardening): replace this with a SHA-256 pinned in the workflow once
+          # it has been verified out of band. Checking against the checksums file
+          # from the same release catches a corrupted or truncated download, not a
+          # compromised release.
+          sha256sum --check --ignore-missing checksums.txt
+          tar -xzf "$tarball" gitleaks
+          chmod +x gitleaks
+          "$RUNNER_TEMP/gitleaks" version
+
+      - name: Scan history
+        run: |
+          "$RUNNER_TEMP/gitleaks" git --redact -v .

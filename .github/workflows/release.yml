@@ -1,0 +1,64 @@
+name: Release
+
+# Publishes to npm with Trusted Publishing (OIDC). There is deliberately no
+# NPM_TOKEN or NODE_AUTH_TOKEN secret anywhere in this repository: the job proves
+# its identity to the registry with a short-lived GitHub OIDC token, and npm
+# attaches a provenance attestation automatically.
+#
+# One-time setup, in this order — npm only lets you configure a trusted publisher
+# for a package that already exists:
+#
+#   1. Publish 0.1.0 by hand from a local checkout: `npm login`, then
+#      `npm publish --access public` (2FA required).
+#   2. On npmjs.com → the package → Settings → Trusted Publisher, add a GitHub
+#      Actions publisher: organisation/user `qingchejun`, repository `mindlm-io`,
+#      workflow filename `release.yml`, and leave the environment field empty
+#      (this job does not use a deployment environment). Tick the box that allows
+#      `npm publish`.
+#   3. Still in Settings, require 2FA and disable token-based publishing, so this
+#      workflow is the only automated path.
+#   4. Every later version: bump `version` in package.json, merge, then create a
+#      GitHub Release for the tag. That fires the job below.
+#   5. After the npm publish, submit `server.json` to the official MCP Registry
+#      with `mcp-publisher` — see docs/launch.md.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      # Trusted Publishing needs npm >= 11.5.1; the npm bundled with Node 24 may
+      # predate it depending on the runner image, so pin the CLI explicitly.
+      - name: Ensure npm supports Trusted Publishing
+        run: |
+          npm install -g npm@^11.5.1
+          npm --version
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm test
+
+      - run: npm run build
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public

@@ -1,0 +1,72 @@
+name: Bug report
+description: Something does not work the way it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not paste API keys, tokens or private URLs. `mindlm-mcp doctor`
+        reports configuration without printing any secret.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what you got instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The exact command or tool call. A minimal input beats a big one.
+      placeholder: |
+        npx -y mindlm-mcp pdf report.pdf --pages 1-5
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where
+      options:
+        - CLI
+        - MCP server (Claude Code)
+        - MCP server (Claude Desktop)
+        - MCP server (Cursor)
+        - MCP server (other client)
+        - Programmatic API
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `mindlm-mcp doctor`
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: mindlm-mcp version
+      placeholder: '0.1.0'
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: OS and Node version
+      placeholder: 'macOS 15.4, Node 22.14.0'
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Error output, a sample file, a link to the page that failed.
