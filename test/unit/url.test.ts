@@ -59,6 +59,16 @@ beforeAll(async () => {
       );
       return;
     }
+    if (path === '/wiki') {
+      void (async () => {
+        const html = await readFile(
+          join(import.meta.dirname, '../fixtures/mediawiki-article.html'),
+        );
+        response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+        response.end(html);
+      })();
+      return;
+    }
     if (path === '/plain') {
       response.writeHead(200, { 'content-type': 'text/plain; charset=utf-8' });
       response.end('First paragraph here.\n\nSecond paragraph here.');
@@ -148,6 +158,44 @@ describe('fetchUrlDocument (HTML)', () => {
     await expect(fetchUrlDocument(server.url('/loop'), { maxRedirects: 2 })).rejects.toThrow(
       /Too many redirects/,
     );
+  });
+
+  it('keeps every section of a wiki-shaped page and drops its furniture', async () => {
+    const result = await fetchUrlDocument(server.url('/wiki'));
+    expect(result.kind).toBe('document');
+    if (result.kind !== 'document') return;
+
+    // Every section title survives, not just the first one: the [edit] link next
+    // to it used to make the whole heading look like a low-content block.
+    const headings = result.document.blocks
+      .filter((block) => block.type === 'heading')
+      .map((block) => block.text);
+    expect(headings).toContain('Origins');
+    expect(headings).toContain('Estate plans');
+    expect(headings).toContain('Regional styles');
+    expect(headings).toContain('Tools');
+
+    const all = textsOf(result.document.blocks).join('\n');
+    expect(all).not.toContain('[edit]');
+    expect(all).not.toContain('[1]');
+    expect(all).not.toContain('From Testipedia, the free encyclopedia');
+    expect(all).not.toContain('This article is about the');
+    expect(all).not.toContain('A hand-drawn map');
+    expect(all).not.toContain('Jump to content');
+    // Trailing citation and link sections are dropped by default.
+    expect(headings).not.toContain('See also');
+    expect(headings).not.toContain('References');
+    expect(headings).not.toContain('External links');
+  });
+
+  it('outlines that page with one branch per section', async () => {
+    const result = await urlToOutline(server.url('/wiki'));
+    expect(result.title).toBe('Cartography of tea');
+    expect(result.markdown).toContain('## Origins');
+    expect(result.markdown).toContain('### Estate plans');
+    expect(result.markdown).toContain('## Regional styles');
+    expect(result.markdown).toContain('## Tools');
+    expect(result.markdown).not.toContain('edit');
   });
 
   it('decodes a GBK page declared only in a meta tag', async () => {

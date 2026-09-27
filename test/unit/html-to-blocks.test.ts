@@ -75,3 +75,64 @@ describe('htmlToBlocks', () => {
     expect(htmlToBlocks('   ')).toEqual([]);
   });
 });
+
+describe('htmlToBlocks (page furniture)', () => {
+  it('keeps a heading wrapped next to an edit link, and drops the link', () => {
+    const blocks = htmlToBlocks(`
+      <div class="mw-heading mw-heading2">
+        <h2 id="Origins">Origins</h2>
+        <span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a
+          href="/w/index.php?action=edit"><span>edit</span></a><span
+          class="mw-editsection-bracket">]</span></span>
+      </div>
+      <p>The first estate plans were commissioned as legal documents.</p>
+    `);
+
+    expect(blocks).toEqual([
+      { type: 'heading', level: 2, text: 'Origins' },
+      { type: 'paragraph', text: 'The first estate plans were commissioned as legal documents.' },
+    ]);
+  });
+
+  it('strips reference markers, notes, site boilerplate and captions', () => {
+    const blocks = htmlToBlocks(`
+      <div id="siteSub" class="noprint">From Testipedia, the free encyclopedia</div>
+      <div role="note" class="hatnote">This article is about the diagrams.</div>
+      <figure><img src="/m.png" alt=""><figcaption>A hand-drawn map of a terrace.</figcaption></figure>
+      <p>Tea cartography draws terraces on a single sheet.<sup class="reference"><a
+        href="#cite_note-1">[1]</a></sup> The earliest examples are estate plans.</p>
+      <div class="navbox" role="navigation"><ul><li><a href="/wiki/Atlas">Atlas</a></li></ul></div>
+    `);
+
+    expect(blocks).toEqual([
+      {
+        type: 'paragraph',
+        text: 'Tea cartography draws terraces on a single sheet. The earliest examples are estate plans.',
+      },
+    ]);
+  });
+
+  it('drops the trailing citation and link sections by default', () => {
+    const html = `
+      <h2>Tools</h2>
+      <p>Most sheets begin life in a geographic information system.</p>
+      <h2>See also</h2>
+      <ul><li>Terrace</li></ul>
+      <h2>References</h2>
+      <ol><li>A. Surveyor, 1873.</li></ol>
+      <h2>External links</h2>
+      <ul><li>A gallery of estate plans</li></ul>
+    `;
+
+    expect(htmlToBlocks(html)).toEqual([
+      { type: 'heading', level: 2, text: 'Tools' },
+      { type: 'paragraph', text: 'Most sheets begin life in a geographic information system.' },
+    ]);
+    // Opt out and they come back.
+    expect(
+      htmlToBlocks(html, { dropBoilerplate: false }).some(
+        (block) => block.type === 'heading' && block.text === 'References',
+      ),
+    ).toBe(true);
+  });
+});

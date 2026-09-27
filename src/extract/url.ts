@@ -4,6 +4,7 @@ import { compactBlocks, type Document } from '../outline/blocks.js';
 import { DEFAULTS } from '../util/env.js';
 import { inputError, usageError } from '../util/errors.js';
 import { USER_AGENT } from '../util/version.js';
+import { stripBoilerplate } from './boilerplate.js';
 import {
   assertAcceptedMime,
   assertFetchAllowed,
@@ -225,6 +226,11 @@ export function extractArticle(html: string, documentUrl: string): ArticleResult
     : `<!doctype html><html><head></head><body>${html}</body></html>`;
   const { document } = parseHTML(source);
   const documentTitle = document.title?.trim() || undefined;
+
+  // Before Readability, not after: it deletes a container that holds little more
+  // than a heading, which is exactly what a section title plus an "[edit]" link
+  // looks like on a wiki. Stripping the furniture first keeps the headings.
+  stripBoilerplate(document as never);
 
   let parsed: ReturnType<Readability['parse']> = null;
   try {

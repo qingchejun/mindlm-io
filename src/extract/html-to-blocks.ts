@@ -7,9 +7,12 @@ import {
   normalizeInline,
   paragraph,
 } from '../outline/blocks.js';
+import { dropBoilerplateSections, isMarkerText, stripBoilerplate } from './boilerplate.js';
 
 /** Elements that never carry readable content. */
 const SKIP_TAGS = new Set([
+  // An image caption describes a picture the mind map will not show.
+  'FIGCAPTION',
   'SCRIPT',
   'STYLE',
   'NOSCRIPT',
@@ -79,11 +82,19 @@ interface DomNode {
 const ELEMENT_NODE = 1;
 const TEXT_NODE = 3;
 
+export interface HtmlToBlocksOptions {
+  /**
+   * Drop "See also", "References", "External links" and friends. On by default:
+   * they are citation and link lists, and a mind map of them says nothing.
+   */
+  dropBoilerplate?: boolean;
+}
+
 /**
  * Parses an HTML string (a full document or a fragment) into Blocks, keeping
  * h1–h6, paragraphs and list nesting and dropping everything else.
  */
-export function htmlToBlocks(html: string): Block[] {
+export function htmlToBlocks(html: string, options: HtmlToBlocksOptions = {}): Block[] {
   // linkedom only runs full tree construction on a complete document, so a
   // fragment has to be wrapped rather than parsed on its own.
   const { document } = parseHTML(
@@ -91,9 +102,12 @@ export function htmlToBlocks(html: string): Block[] {
   );
   const body = document.body as unknown as DomNode | null;
   if (!body) return [];
+  // Idempotent, so it costs nothing when the caller already cleaned the page.
+  stripBoilerplate(document as never);
   const blocks: Block[] = [];
   walk(body, blocks, 0);
-  return compactBlocks(mergeAdjacentParagraphs(blocks));
+  const merged = compactBlocks(mergeAdjacentParagraphs(blocks));
+  return options.dropBoilerplate === false ? merged : dropBoilerplateSections(merged);
 }
 
 /**
@@ -113,7 +127,7 @@ function walk(node: DomNode, out: Block[], listDepth: number): void {
     if (child.nodeType === TEXT_NODE) {
       const text = normalizeInline(child.textContent ?? '');
       // Loose text directly under a container still counts as prose.
-      if (text !== '' && text.length > 1) out.push(paragraph(text));
+      if (text.length > 1 && !isMarkerText(text)) out.push(paragraph(text));
       continue;
     }
     if (child.nodeType !== ELEMENT_NODE) continue;
@@ -133,18 +147,19 @@ function walk(node: DomNode, out: Block[], listDepth: number): void {
         continue;
       case 'LI': {
         const text = inlineText(child);
-        if (text !== '') out.push(listItem(Math.max(0, listDepth - 1), text));
+        if (text !== '' && !isMarkerText(text)) {
+          out.push(listItem(Math.max(0, listDepth - 1), text));
+        }
         // Nested lists inside the item continue one level deeper.
         walkListChildren(child, out, listDepth);
         continue;
       }
       case 'P':
       case 'BLOCKQUOTE':
-      case 'FIGCAPTION':
       case 'DD':
       case 'DT': {
         const text = inlineText(child);
-        if (text !== '') out.push(paragraph(text));
+        if (text !== '' && !isMarkerText(text)) out.push(paragraph(text));
         // A paragraph can still wrap a nested list in real-world markup.
         walkListChildren(child, out, listDepth);
         continue;
