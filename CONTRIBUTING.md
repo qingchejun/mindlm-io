@@ -41,6 +41,9 @@ service, an account, telemetry, or a required API key are not — zero-key opera
 - **No telemetry and no update check.**
 - Tests go with the change: a unit test for logic, and an e2e test if it crosses the CLI or the MCP
   boundary. Network-dependent tests use the local server in `test/helpers/http-server.ts`.
+- Fixtures under `test/fixtures/` are small and synthetic — never a copy of a real page or document.
+  The PDFs are generated: `node scripts/make-fixture-pdf.mjs` rewrites `sample.pdf` (bookmarks,
+  numbered headings) and `wrapped.pdf` (a print-to-PDF with soft-wrapped paragraphs).
 - Keep comments about *why*, not *what*. Match the style already in the file.
 - Conventional commit subjects (`feat:`, `fix:`, `docs:`, `test:`, `chore:`) — the changelog is
   written from them.

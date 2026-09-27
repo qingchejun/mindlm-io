@@ -64,6 +64,30 @@ describe('metadata commands', () => {
     }
   });
 
+  it('print one usage line, with [command] only once', async () => {
+    const { stdout, code } = await cli(['--help']);
+    expect(code).toBe(0);
+    expect(stdout.split('\n')[0]).toBe('Usage: mindlm-mcp [options] [command]');
+  });
+
+  it('name the model doctor would use, default or not', async () => {
+    const withDefault = await cli(['doctor'], {
+      env: { ANTHROPIC_API_KEY: 'placeholder-value', MINDMAP_OUTPUT_DIR: directory },
+    });
+    expect(withDefault.code).toBe(0);
+    expect(withDefault.stdout).toContain('model claude-sonnet-5 (default)');
+
+    const withOverride = await cli(['doctor'], {
+      env: {
+        ANTHROPIC_API_KEY: 'placeholder-value',
+        MINDMAP_LLM_MODEL: 'some-other-model',
+        MINDMAP_OUTPUT_DIR: directory,
+      },
+    });
+    expect(withOverride.stdout).toContain('model some-other-model');
+    expect(withOverride.stdout).not.toContain('(default)');
+  });
+
   it('report the zero-key configuration in doctor', async () => {
     const { stdout, code } = await cli(['doctor'], {
       env: { ANTHROPIC_API_KEY: '', OPENAI_API_KEY: '', MINDMAP_OUTPUT_DIR: directory },

@@ -11,10 +11,15 @@ import { MindlmError, usageError } from '../util/errors.js';
 export type Provider = 'anthropic' | 'openai';
 
 /**
- * Anthropic ships a stable, documented model alias, so the tool works with a
- * key and nothing else. "openai" covers every OpenAI-compatible endpoint
- * (DeepSeek, Qwen, vLLM, a local gateway…) where no name is portable, so there
- * the model has to be named explicitly.
+ * Anthropic publishes stable model aliases, so the tool works with a key and
+ * nothing else; `claude-sonnet-5` is the current mid-tier alias in Anthropic's
+ * model overview (checked 2026-09-27) and is the right shape for this job —
+ * one short structured completion per document. Override it with
+ * `MINDMAP_LLM_MODEL` or `--model`.
+ *
+ * "openai" covers every OpenAI-compatible endpoint (DeepSeek, Qwen, vLLM, a
+ * local gateway…) where no name is portable, so there the model has to be
+ * named explicitly.
  */
 export const DEFAULT_MODELS: Record<Provider, string | undefined> = {
   anthropic: 'claude-sonnet-5',

@@ -137,7 +137,10 @@ With `"mode": "heuristic"` (or when an API key makes it `"llm"`) the result is t
 
 Fetch a page and outline its main content. Article text is extracted with
 [Readability](https://github.com/mozilla/readability); navigation, footers and boilerplate are
-dropped. A URL that serves a PDF is handed to the PDF pipeline automatically.
+dropped. Page furniture goes too: reference markers (`[1]`), "[edit]" links, notes above the
+article, image captions, navigation boxes, and the trailing *See also* / *References* / *Notes* /
+*Further reading* / *External links* / *Bibliography* sections, which are link lists rather than
+content. A URL that serves a PDF is handed to the PDF pipeline automatically.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -171,7 +174,10 @@ Input:
 
 ### `pdf_to_mindmap`
 
-Read a local PDF, using its bookmarks as the skeleton when it has them.
+Read a local PDF, using its bookmarks as the skeleton when it has them. A PDF stores positioned
+lines rather than paragraphs, so the soft-wrapped lines of one paragraph are rejoined before
+sentences are split — otherwise a browser's "print to PDF" would yield nodes like "releases
+oxygen." instead of whole sentences.
 
 | Field | Type | Notes |
 |---|---|---|

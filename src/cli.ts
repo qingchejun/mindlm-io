@@ -16,13 +16,14 @@ import { DEMO_MARKDOWN, DEMO_TITLE } from './demo.js';
 import { pdfBytesToDocument, pdfFileToDocument, resolveUserPath } from './extract/pdf.js';
 import { textToDocument } from './extract/text.js';
 import { fetchUrlDocument } from './extract/url.js';
+import { DEFAULT_MODELS } from './llm/config.js';
 import { serveMindlmStdio } from './mcp/serve.js';
 import type { Document } from './outline/blocks.js';
 import { type GeneratedOutline, generateOutline } from './outline/generate.js';
 import type { RequestedMode } from './outline/mode.js';
 import { type ExportResult, exportMindmap } from './render/export.js';
 import { resolveOutputPath, writeOutputFile } from './render/output.js';
-import { llmEnv, outputDir } from './util/env.js';
+import { type LlmEnv, llmEnv, outputDir } from './util/env.js';
 import { describeError, MindlmError, usageError } from './util/errors.js';
 import { VERSION } from './util/version.js';
 
@@ -62,6 +63,9 @@ export function buildProgram(): Command {
     )
     .version(VERSION, '-v, --version')
     .showHelpAfterError('(run `mindlm-mcp --help` for usage)')
+    // Commander appends "[command]" itself when subcommands exist, and the
+    // catch-all argument below would make it appear twice.
+    .usage('[options] [command]')
     .argument('[command]', 'one of the commands below')
     .action(async (command: string | undefined) => {
       if (command !== undefined) {
@@ -295,15 +299,26 @@ async function runDoctor(): Promise<void> {
   const lines = [
     `version     mindlm-mcp ${VERSION}`,
     `node        ${process.version} ${nodeOk ? '(ok)' : '(TOO OLD — needs >=22.12)'}`,
-    env.hasKey
-      ? `llm         configured: ${env.provider}${env.model ? `, model ${env.model}` : ', default model'}`
-      : 'llm         not configured — zero-key mode',
+    `llm         ${describeLlm(env)}`,
     `auto mode   cli → ${env.hasKey ? 'llm' : 'heuristic'} · mcp → ${env.hasKey ? 'llm' : 'client'}`,
     `output dir  ${directory} (${await describeWritable(directory)})`,
   ];
 
   process.stdout.write(`${lines.join('\n')}\n`);
   if (!nodeOk) process.exitCode = 2;
+}
+
+/**
+ * One line for `doctor`. The model is named outright, default or not, so nobody
+ * has to guess which id the next call will use.
+ */
+function describeLlm(env: LlmEnv): string {
+  if (!env.hasKey || env.provider === undefined) return 'not configured — zero-key mode';
+  const model = env.model ?? DEFAULT_MODELS[env.provider];
+  if (model === undefined) {
+    return `${env.provider}: no model — set MINDMAP_LLM_MODEL or pass --model`;
+  }
+  return `configured: ${env.provider}, model ${model}${env.model ? '' : ' (default)'}`;
 }
 
 /** Reports on the nearest existing ancestor: the directory itself is created on demand. */
