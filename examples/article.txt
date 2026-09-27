@@ -1,0 +1,15 @@
+Why note-taking tools keep reinventing the outline
+
+Every few years a new note-taking application arrives promising to fix thinking itself. The interface changes, the storage format changes, the marketing certainly changes. Underneath, almost all of them converge on the same primitive: an indented list. The outline survives because it is the cheapest structure that still carries meaning. A heading says "this is a topic", an indent says "this belongs to the thing above it", and that is very nearly the whole grammar.
+
+Mind maps are outlines drawn sideways. The radial layout is not a different data model; it is a different projection of the same tree. That is why converting between the two is mechanical, and why a tool that can produce a good outline can produce a good mind map for free. The hard part was never the drawing. The hard part is deciding what belongs in the tree at all.
+
+Consider a research paper. The section headings give you a skeleton, but a skeleton is not a summary. The interesting content sits in the first sentence of each paragraph, in the numbers in the results table, in the one caveat buried in the discussion. A reader building a map by hand makes hundreds of small judgements about what to keep. Any automatic system has to make the same judgements, and it will make some of them badly.
+
+There are two honest ways to handle that. The first is to be deterministic and admit the limits: parse the structure that is actually there, rank sentences by crude signals like position and term frequency, and produce a draft that a person can fix in a minute. The second is to hand the material to a language model, which is better at judgement and worse at consistency. Neither is strictly superior. A draft you can trust to be stable is worth a great deal when you are processing forty documents; a draft that reads well matters more when you are processing one.
+
+What is unreasonable is to pretend the two are the same. A tool that quietly falls back from a model to a rule-based algorithm, and reports the result as if nothing happened, has told you a small lie about the quality of what you are reading. The fix is not technical sophistication. It is a field in the output that says which path ran.
+
+The other quiet lie is the offline claim. An exported file that loads its JavaScript from a content delivery network works beautifully until the day the network does not, or until you open it on a plane, or until the version you pinned is unpublished. Inlining three hundred kilobytes of library code feels wasteful right up to the moment it is the only reason the file still opens.
+
+None of this is new. It is the same trade between fidelity and portability that document formats have been making since the invention of the printing press. The outline endures because it is the part that survives the trade.
