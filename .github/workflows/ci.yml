@@ -118,6 +118,7 @@ jobs:
       - name: Install gitleaks
         env:
           GITLEAKS_VERSION: 8.30.1
+          GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
         # Installed outside the checkout so the binary is not itself scanned.
         working-directory: ${{ runner.temp }}
         run: |
@@ -127,11 +128,11 @@ jobs:
           curl --fail --silent --show-error --location -o "$tarball" "$base/$tarball"
           curl --fail --silent --show-error --location -o checksums.txt \
             "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
-          # TODO(hardening): replace this with a SHA-256 pinned in the workflow once
-          # it has been verified out of band. Checking against the checksums file
-          # from the same release catches a corrupted or truncated download, not a
-          # compromised release.
+          # Two checks: the release's own checksums file (catches a corrupted or
+          # truncated download) and a SHA-256 pinned here, recorded on 2026-09-27
+          # from the v8.30.1 release (catches the release asset changing later).
           sha256sum --check --ignore-missing checksums.txt
+          echo "${GITLEAKS_SHA256}  $tarball" | sha256sum --check -
           tar -xzf "$tarball" gitleaks
           chmod +x gitleaks
           "$RUNNER_TEMP/gitleaks" version
