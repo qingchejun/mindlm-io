@@ -8,6 +8,6 @@
  * everywhere else under `src/`.
  */
 export const BRANDING_URL =
-  'https://mindlm.io/?utm_source=export&utm_medium=referral&utm_campaign=mindlm-mcp';
+  'https://mindlm.io/en/?utm_source=export&utm_medium=referral&utm_campaign=mindlm-mcp';
 
 export const BRANDING_LABEL = 'Made with mindlm-mcp · mindlm.io';

@@ -18,7 +18,7 @@ import {
 } from '../../scripts/check-pages-links.mjs';
 
 const GOOD_URL =
-  'https://mindlm.io/?utm_source=github-pages&utm_medium=referral&utm_campaign=mindlm-mcp';
+  'https://mindlm.io/en/?utm_source=github-pages&utm_medium=referral&utm_campaign=mindlm-mcp';
 
 const GOOD_PAGE = `<!doctype html>
 <html lang="en">
@@ -77,7 +77,7 @@ describe('checkHtml — violations', () => {
   });
 
   it('rejects the wrong campaign tag', () => {
-    expect(rules(checkHtml(`<a href="https://mindlm.io/?utm_source=github">x</a>`))).toEqual([
+    expect(rules(checkHtml(`<a href="https://mindlm.io/en/?utm_source=github">x</a>`))).toEqual([
       'utm',
     ]);
   });
