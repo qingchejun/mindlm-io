@@ -1,0 +1,70 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.qingchejun/mindlm-mcp",
+  "description": "Turn text, web pages and PDFs into interactive mind maps. MCP server + CLI, no API key.",
+  "version": "0.1.0",
+  "websiteUrl": "https://qingchejun.github.io/mindlm-io/",
+  "repository": {
+    "url": "https://github.com/qingchejun/mindlm-io",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "mindlm-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "serve",
+          "valueHint": "serve",
+          "description": "Starts the MCP server on stdio.",
+          "isRequired": true
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "MINDMAP_OUTPUT_DIR",
+          "description": "Directory for exported HTML mind maps. Defaults to ./mindmaps.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "description": "Optional. Set it to let the server write outlines with a model itself instead of handing a draft back to the client.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "description": "Optional. Same as ANTHROPIC_API_KEY, for any OpenAI-compatible endpoint.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "OPENAI_BASE_URL",
+          "description": "Optional. OpenAI-compatible endpoint. Defaults to https://api.openai.com/v1.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "MINDMAP_LLM_MODEL",
+          "description": "Optional. Model name. Required when using an OpenAI-compatible endpoint.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "MINDMAP_ALLOW_PRIVATE_HOSTS",
+          "description": "Optional. Set to true to let url_to_mindmap reach loopback and private addresses. Off by default.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
