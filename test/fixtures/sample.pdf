@@ -1,0 +1,120 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R /Outlines 4 0 R /PageMode /UseOutlines >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Outlines /First 5 0 R /Last 6 0 R /Count 2 >>
+endobj
+5 0 obj
+<< /Title (1. Introduction) /Parent 4 0 R /Next 6 0 R /Dest [7 0 R /XYZ 72 792 0] >>
+endobj
+6 0 obj
+<< /Title (2. Methods) /Parent 4 0 R /Prev 5 0 R /Dest [9 0 R /XYZ 72 792 0] >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 384 >>
+stream
+BT
+/F1 18 Tf
+72 720 Td
+22 TL
+(1. Introduction) Tj
+ET
+BT
+/F1 11 Tf
+72 684 Td
+16 TL
+(Mind maps turn a wall of prose into something you can scan in one glance,) Tj
+T*
+(which is exactly what a reader needs when the source runs to many pages.) Tj
+T*
+(This fixture exists so the PDF extractor can be tested without shipping a) Tj
+T*
+(multi-megabyte sample document in the repository.) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 386 >>
+stream
+BT
+/F1 18 Tf
+72 720 Td
+22 TL
+(2. Methods) Tj
+ET
+BT
+/F1 11 Tf
+72 684 Td
+16 TL
+(Text is pulled page by page, then the lines are classified: numbered or) Tj
+T*
+(short lines become headings and everything else becomes a paragraph.) Tj
+T*
+(Bookmarks, when the document has them, override that guess entirely.) Tj
+T*
+(The outline generator only ever sees the resulting block structure.) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 296 >>
+stream
+BT
+/F1 18 Tf
+72 720 Td
+22 TL
+(2.1 Limits) Tj
+ET
+BT
+/F1 11 Tf
+72 684 Td
+16 TL
+(Scanned documents have no text layer at all, so they are rejected with a) Tj
+T*
+(clear error rather than silently producing an empty mind map.) Tj
+T*
+(Optical character recognition is out of scope for this tool.) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Title (mindlm-mcp PDF fixture) /Producer (scripts/make-fixture-pdf.mjs) >>
+endobj
+xref
+0 14
+0000000000 65535 f 
+0000000015 00000 n 
+0000000103 00000 n 
+0000000173 00000 n 
+0000000270 00000 n 
+0000000341 00000 n 
+0000000441 00000 n 
+0000000536 00000 n 
+0000000662 00000 n 
+0000001097 00000 n 
+0000001224 00000 n 
+0000001662 00000 n 
+0000001790 00000 n 
+0000002138 00000 n 
+trailer
+<< /Size 14 /Root 1 0 R /Info 13 0 R >>
+startxref
+2233
+%%EOF
