@@ -1,0 +1,12 @@
+# Note: this site is served from a project subpath
+# (https://qingchejun.github.io/mindlm-io/), and crawlers only read the robots.txt
+# at the host root — https://qingchejun.github.io/robots.txt. This file is kept in
+# sync so the rules are correct if the site ever moves to its own domain.
+
+User-agent: *
+Allow: /
+
+# Internal checklist, not a page.
+Disallow: /mindlm-io/launch.md
+
+Sitemap: https://qingchejun.github.io/mindlm-io/sitemap.xml

@@ -165,6 +165,12 @@ describe('branding footer', () => {
     expect(html).toContain(`<a href="${escapeHtml(BRANDING_URL)}"`);
     expect(html).toContain('Made with mindlm-mcp');
   });
+
+  it('tags the footer link so exported files are distinguishable from the other surfaces', () => {
+    // README uses utm_source=github, Pages github-pages, npm npm — exports are their own source.
+    expect(BRANDING_URL).toContain('utm_source=export');
+    expect(BRANDING_URL).toContain('utm_campaign=mindlm-mcp');
+  });
 });
 
 describe('asset resolution', () => {

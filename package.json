@@ -49,7 +49,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "demo:gen": "node scripts/gen-demo.mjs",
+    "check:links": "node scripts/check-pages-links.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.1.0",
