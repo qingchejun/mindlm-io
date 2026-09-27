@@ -1,0 +1,100 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R /Outlines 4 0 R /PageMode /UseOutlines >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 689 >>
+stream
+BT
+/F1 18 Tf
+72 720 Td
+22 TL
+(Photosynthesis: A Short Primer) Tj
+ET
+BT
+/F1 11 Tf
+72 684 Td
+16 TL
+(1. Overview) Tj
+T*
+(Photosynthesis is the process by which green plants and algae convert light) Tj
+T*
+(energy into the chemical energy held in sugars. It draws in carbon dioxide) Tj
+T*
+(and water, stores what it needs as glucose, and releases the rest as) Tj
+T*
+(oxygen. Almost every food chain on the planet starts here.) Tj
+T*
+(2. Inputs and outputs) Tj
+T*
+(The reaction takes six molecules of carbon dioxide and six of water and) Tj
+T*
+(rearranges them, with the help of sunlight caught by chlorophyll, into) Tj
+T*
+(glucose. Six molecules of oxygen leave the leaf as a by-product.) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 473 >>
+stream
+BT
+/F1 18 Tf
+72 720 Td
+22 TL
+(3. Why it matters) Tj
+ET
+BT
+/F1 11 Tf
+72 684 Td
+16 TL
+(Every gram of sugar a plant stores is energy that something else will) Tj
+T*
+(eventually eat, which is why the productivity of a forest or an ocean is) Tj
+T*
+(measured in carbon fixed per year.) Tj
+T*
+(The same reaction is what keeps atmospheric oxygen where it is, and it is) Tj
+T*
+(the reason a warming ocean with less plankton in it is a problem far) Tj
+T*
+(beyond the plankton.) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Title (Photosynthesis: A Short Primer) /Producer (scripts/make-fixture-pdf.mjs) >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000103 00000 n 
+0000000166 00000 n 
+0000000263 00000 n 
+0000000309 00000 n 
+0000000435 00000 n 
+0000001175 00000 n 
+0000001301 00000 n 
+0000001825 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R /Info 9 0 R >>
+startxref
+1927
+%%EOF

@@ -257,10 +257,13 @@ export function pagesToBlocks(
   const blocks: Block[] = [];
   for (const { page, text } of pageTexts) {
     if (blocks.length > 0) blocks.push(pageBreak(page));
-    const lines = text
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line !== '');
+    const lines = joinWrappedLines(
+      text
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line !== ''),
+      (line) => bookmarks.has(normalizeKey(line)),
+    );
 
     for (let index = 0; index < lines.length; index += 1) {
       const line = lines[index]!;
@@ -281,6 +284,73 @@ export function pagesToBlocks(
 
 function normalizeKey(text: string): string {
   return text.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+/** A line that ends a sentence, so the next line starts a new one. */
+const SENTENCE_END = /[.!?。！？…:：;；]["'”’»)\]]?$/u;
+/** A bullet or lettered item: its own unit, never a continuation. */
+const BULLET_LINE = /^([-–—*•·▪‣◦]|\(?[a-z][.)])\s/iu;
+
+/**
+ * Rejoins the soft-wrapped lines of one paragraph.
+ *
+ * A PDF has no paragraphs, only positioned text runs: a print-to-PDF of a web
+ * page emits one line per visual line, so sentence splitting downstream would
+ * otherwise see "energy." or "releases oxygen." as whole units. A line is a
+ * continuation when the line above it neither ended a sentence nor looked like a
+ * label, and either that line ran the full width of the column or this one
+ * starts mid-sentence.
+ *
+ * `isHeading` reports lines the caller already knows are structural (a bookmark
+ * title), which never absorb the prose beneath them.
+ */
+export function joinWrappedLines(
+  lines: string[],
+  isHeading: (line: string) => boolean = () => false,
+): string[] {
+  if (lines.length < 2) return [...lines];
+  // The widest line approximates the text column; a wrapped line fills it.
+  const width = Math.max(...lines.map((line) => line.length));
+  const full = Math.max(28, Math.round(width * 0.66));
+
+  const out: string[] = [];
+  for (const line of lines) {
+    const previous = out[out.length - 1];
+    if (previous !== undefined && continues(previous, line, full, isHeading)) {
+      out[out.length - 1] = joinTwo(previous, line);
+      continue;
+    }
+    out.push(line);
+  }
+  return out;
+}
+
+function continues(
+  previous: string,
+  line: string,
+  full: number,
+  isHeading: (line: string) => boolean,
+): boolean {
+  if (opensItsOwnUnit(line) || opensItsOwnUnit(previous)) return false;
+  if (isHeading(line) || isHeading(previous)) return false;
+  if (SENTENCE_END.test(previous)) return false;
+  // A lower-case (or CJK) start cannot begin a sentence, so it is a wrap even
+  // when the line above stopped short of the column edge.
+  if (/^[\p{Ll}\p{Script=Han},，、)）]/u.test(line)) return true;
+  return previous.length >= full;
+}
+
+/** Numbered headings, CJK chapters and bullets all start a unit of their own. */
+function opensItsOwnUnit(line: string): boolean {
+  return BULLET_LINE.test(line) || NUMBERED.test(line) || CJK_CHAPTER.test(line);
+}
+
+/** A hyphen at a line break belongs to the word, not to the text. */
+function joinTwo(previous: string, line: string): string {
+  if (/\p{L}-$/u.test(previous) && /^\p{Ll}/u.test(line)) {
+    return `${previous.slice(0, -1)}${line}`;
+  }
+  return `${previous} ${line}`;
 }
 
 const NUMBERED = /^(\d+(\.\d+)*)[.、)\s]\s*\S/;
