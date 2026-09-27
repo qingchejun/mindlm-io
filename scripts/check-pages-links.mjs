@@ -7,13 +7,15 @@
  * Concretely, a link is only allowed if all of this holds:
  *   - it lives in the `href` of an `<a>` tag, not in text, a `<meta>` or a script;
  *   - the URL contains `utm_source=github-pages`;
+ *   - the path has no trailing slash (`/en/` answers 308 → `/en`, so the link
+ *     must point at `/en` directly); the bare root `/` is fine;
  *   - the anchor has no `rel` with nofollow / sponsored / ugc, no `target`, and
  *     no inline event handler;
  *   - nothing redirects to mindlm.io via `<meta http-equiv="refresh">`,
  *     `window.location` or an `onclick`.
  *
- * Markdown under docs/ is checked too, but only for the campaign tag and for the
- * anchor rules above, since a Markdown link is plain by construction.
+ * Markdown under docs/ is checked too, but only for the campaign tag, the
+ * trailing-slash rule and the anchor rules above, since a Markdown link is plain by construction.
  *
  * Run it with `npm run check:links`. It scans docs/**\/*.html and docs/**\/*.md,
  * including the generated docs/demo/ when a build has produced it, prints what
@@ -32,6 +34,7 @@ const HANDLER_ATTRIBUTE = /\son[a-z]+\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi
 
 export const RULES = [
   `every mindlm.io URL sits in a plain <a href> carrying ${REQUIRED_UTM}`,
+  'no trailing slash on a mindlm.io path (e.g. /en, not /en/ — that one is a 308)',
   'no rel="nofollow" / "sponsored" / "ugc", no target, no inline handler',
   'no mindlm.io URL inside <script>/<style>, a <meta>, or a JS redirect',
 ];
@@ -44,6 +47,24 @@ export const RULES = [
 export function findUrls(text) {
   URL_PATTERN.lastIndex = 0;
   return [...text.matchAll(URL_PATTERN)].map((match) => ({ url: match[0], index: match.index }));
+}
+
+/**
+ * True when a mindlm.io URL has a non-root path ending in `/` (e.g. `/en/?…`),
+ * which the site answers with a 308 to the slash-less path.
+ */
+export function hasTrailingSlash(url) {
+  const match = /mindlm\.io(\/[^?#]*)?/i.exec(url);
+  const path = match?.[1] ?? '';
+  return path.length > 1 && path.endsWith('/');
+}
+
+function trailingSlashProblem(url, index) {
+  return {
+    index,
+    rule: 'trailing-slash',
+    message: `link to mindlm.io has a trailing slash on its path (308 redirect) — drop it: ${url}`,
+  };
 }
 
 /** The body ranges of `<tag>…</tag>`, excluding the tags themselves. */
@@ -101,6 +122,9 @@ function anchorProblems(text, claimed, problems) {
         rule: 'utm',
         message: `link to mindlm.io is missing ${REQUIRED_UTM}: ${href.value}`,
       });
+    }
+    if (hasTrailingSlash(href.value)) {
+      problems.push(trailingSlashProblem(href.value, anchor.index));
     }
     const rel = anchor.attributes.get('rel');
     if (rel && BANNED_REL.test(rel.value)) {
@@ -180,7 +204,12 @@ export function checkHtml(text) {
 /** Checks Markdown. A `[text](url)` link is plain already, so only the tag and raw HTML matter. */
 export function checkMarkdown(text) {
   const problems = [];
+  /** Raw-HTML anchor hrefs; anchorProblems already applies the slash rule to those. */
+  const claimed = [];
+  anchorProblems(text, claimed, problems);
   for (const { url, index } of findUrls(text)) {
+    const inAnchor = claimed.some(([start, end]) => index >= start && index < end);
+    if (!inAnchor && hasTrailingSlash(url)) problems.push(trailingSlashProblem(url, index));
     if (url.includes(REQUIRED_UTM)) continue;
     problems.push({
       index,
@@ -188,7 +217,6 @@ export function checkMarkdown(text) {
       message: `link to mindlm.io is missing ${REQUIRED_UTM}: ${url}`,
     });
   }
-  anchorProblems(text, [], problems);
   return problems.sort((a, b) => a.index - b.index);
 }
 

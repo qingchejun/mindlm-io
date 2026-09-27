@@ -14,11 +14,12 @@ import {
   checkMarkdown,
   checkSource,
   findUrls,
+  hasTrailingSlash,
   lineOf,
 } from '../../scripts/check-pages-links.mjs';
 
 const GOOD_URL =
-  'https://mindlm.io/en/?utm_source=github-pages&utm_medium=referral&utm_campaign=mindlm-mcp';
+  'https://mindlm.io/en?utm_source=github-pages&utm_medium=referral&utm_campaign=mindlm-mcp';
 
 const GOOD_PAGE = `<!doctype html>
 <html lang="en">
@@ -52,6 +53,26 @@ describe('findUrls', () => {
   it('does not match a lookalike domain', () => {
     expect(findUrls('https://notmindlm.iowa.example/')).toEqual([]);
   });
+
+  it('matches the slash-less /en path with its query intact', () => {
+    expect(findUrls(`<a href="${GOOD_URL}">x</a>`).map((hit) => hit.url)).toEqual([GOOD_URL]);
+    expect(GOOD_URL).toContain('mindlm.io/en?');
+  });
+});
+
+describe('hasTrailingSlash', () => {
+  it.each([
+    ['https://mindlm.io/en/?utm_source=github-pages', true],
+    ['https://mindlm.io/en/', true],
+    ['https://mindlm.io/en/#top', true],
+    ['https://mindlm.io/en?utm_source=github-pages', false],
+    ['https://mindlm.io/en', false],
+    ['https://mindlm.io/', false],
+    ['https://mindlm.io', false],
+    ['https://mindlm.io/?utm_source=github-pages', false],
+  ])('%s → %s', (url, expected) => {
+    expect(hasTrailingSlash(url)).toBe(expected);
+  });
 });
 
 describe('checkHtml — the page we actually ship', () => {
@@ -77,9 +98,17 @@ describe('checkHtml — violations', () => {
   });
 
   it('rejects the wrong campaign tag', () => {
-    expect(rules(checkHtml(`<a href="https://mindlm.io/en/?utm_source=github">x</a>`))).toEqual([
+    expect(rules(checkHtml(`<a href="https://mindlm.io/en?utm_source=github">x</a>`))).toEqual([
       'utm',
     ]);
+  });
+
+  it('rejects a trailing slash on /en, which answers 308', () => {
+    // Deliberate violation: /en/ redirects to /en.
+    const slashed = GOOD_URL.replace('/en?', '/en/?');
+    const problems = checkHtml(`<a href="${slashed}">mindlm.io</a>`);
+    expect(rules(problems)).toEqual(['trailing-slash']);
+    expect(problems[0].message).toContain('trailing slash');
   });
 
   it.each(['nofollow', 'sponsored', 'ugc', 'noopener nofollow'])('rejects rel="%s"', (rel) => {
@@ -160,6 +189,19 @@ describe('checkHtml — violations', () => {
 describe('checkMarkdown', () => {
   it('accepts a tagged Markdown link', () => {
     expect(checkMarkdown(`See [mindlm.io](${GOOD_URL}) for the editor.`)).toEqual([]);
+  });
+
+  it('rejects a trailing slash on a Markdown link', () => {
+    // Deliberate violation: /en/ redirects to /en.
+    const slashed = GOOD_URL.replace('/en?', '/en/?');
+    expect(rules(checkMarkdown(`See [mindlm.io](${slashed}) for the editor.`))).toEqual([
+      'trailing-slash',
+    ]);
+  });
+
+  it('reports a slashed raw-HTML anchor in Markdown once', () => {
+    const slashed = GOOD_URL.replace('/en?', '/en/?');
+    expect(rules(checkMarkdown(`<a href="${slashed}">mindlm.io</a>`))).toEqual(['trailing-slash']);
   });
 
   it('rejects an untagged one', () => {

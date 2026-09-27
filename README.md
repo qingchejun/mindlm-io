@@ -400,7 +400,7 @@ npm ci && npm run lint && npm run typecheck && npm test && npm run build
 
 mindlm-mcp is deliberately small: outline in, one HTML file out. If you want to keep editing the
 map afterwards — drag nodes around, restyle branches, collaborate, keep a library of maps — that
-is what [mindlm.io](https://mindlm.io/en/?utm_source=github&utm_medium=readme&utm_campaign=mindlm-mcp)
+is what [mindlm.io](https://mindlm.io/en?utm_source=github&utm_medium=readme&utm_campaign=mindlm-mcp)
 is for. This package works completely on its own and never talks to it.
 
 ## License
