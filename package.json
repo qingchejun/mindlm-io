@@ -54,7 +54,7 @@
     "check:links": "node scripts/check-pages-links.mjs"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "^2.1.0",
+    "@modelcontextprotocol/server": "^2.2.0",
     "@mozilla/readability": "^0.6.0",
     "commander": "^15.0.0",
     "d3": "^7.9.0",
