@@ -68,11 +68,11 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.14",
-    "@modelcontextprotocol/client": "^2.1.0",
+    "@biomejs/biome": "^2.5.15",
+    "@modelcontextprotocol/client": "^2.2.0",
     "@types/node": "^22.20.4",
-    "@vitest/coverage-v8": "^5.0.2",
-    "publint": "^0.3.24",
+    "@vitest/coverage-v8": "^5.0.3",
+    "publint": "^0.3.25",
     "tsdown": "^0.23.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.2"
