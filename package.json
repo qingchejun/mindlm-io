@@ -1,6 +1,6 @@
 {
   "name": "mindlm-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server + CLI that turns text, web pages and PDFs into interactive mind maps (Markdown outline → standalone markmap HTML). Zero API key required.",
   "type": "module",
   "license": "MIT",
