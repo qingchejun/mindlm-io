@@ -41,7 +41,7 @@ and never commit a real key.
 | `ANTHROPIC_API_KEY` | Switches `mode: "auto"` from `client` to `llm`. |
 | `OPENAI_API_KEY` | Same, for any OpenAI-compatible endpoint. |
 | `OPENAI_BASE_URL` | The endpoint to use with `OPENAI_API_KEY`. |
-| `MINDMAP_LLM_MODEL` | Model name. Optional for Anthropic (defaults to `claude-sonnet-5`), required for OpenAI-compatible endpoints. |
+| `MINDMAP_LLM_MODEL` | Model name. Optional for Anthropic (defaults to `claude-sonnet-5-5`), required for OpenAI-compatible endpoints. |
 | `MINDMAP_ALLOW_PRIVATE_HOSTS` | Set to `true` to let `url_to_mindmap` reach localhost and private networks. Off by default. |
 | `MINDMAP_MAX_INPUT_CHARS` | Cap on characters read from any one input. Default 200000. |
 | `MINDMAP_CLIENT_MAX_CHARS` | Cap on the source text returned in `client` mode. Default 60000. |

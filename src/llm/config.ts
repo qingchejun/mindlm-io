@@ -12,8 +12,8 @@ export type Provider = 'anthropic' | 'openai';
 
 /**
  * Anthropic publishes stable model aliases, so the tool works with a key and
- * nothing else; `claude-sonnet-5` is the current mid-tier alias in Anthropic's
- * model overview (checked 2026-09-27) and is the right shape for this job —
+ * nothing else; `claude-sonnet-5-5` is the current mid-tier alias in Anthropic's
+ * model overview (checked 2026-10-14; `claude-sonnet-5` is now legacy) and is the right shape for this job —
  * one short structured completion per document. Override it with
  * `MINDMAP_LLM_MODEL` or `--model`.
  *
@@ -22,7 +22,7 @@ export type Provider = 'anthropic' | 'openai';
  * named explicitly.
  */
 export const DEFAULT_MODELS: Record<Provider, string | undefined> = {
-  anthropic: 'claude-sonnet-5',
+  anthropic: 'claude-sonnet-5-5',
   openai: undefined,
 };
 

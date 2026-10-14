@@ -3,10 +3,7 @@
 Turn text, web pages and PDFs into interactive mind maps — an MCP server *and* a command-line
 tool, with no API key required.
 
-<!-- PLACEHOLDER: demo GIF -->
-<!-- TODO: record the demo (terminal running `npx -y mindlm-mcp demo`, then the map opening in a
-     browser) and commit it as docs/assets/demo.gif. Once it exists, replace this comment with:
-     ![mindlm-mcp turning an outline into a mind map](docs/assets/demo.gif) -->
+![mindlm-mcp turning an outline into a mind map](https://raw.githubusercontent.com/qingchejun/mindlm-io/main/docs/assets/demo.gif)
 
 ```bash
 npx -y mindlm-mcp demo
@@ -331,7 +328,7 @@ client's `env` block.
 | `ANTHROPIC_API_KEY` | — | Switches `auto` to `llm` mode. |
 | `OPENAI_API_KEY` | — | Same, for any OpenAI-compatible endpoint. |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | The endpoint used with `OPENAI_API_KEY`. |
-| `MINDMAP_LLM_MODEL` | `claude-sonnet-5` for Anthropic | Model name. **Required** for OpenAI-compatible endpoints, where no name is portable. |
+| `MINDMAP_LLM_MODEL` | `claude-sonnet-5-5` for Anthropic | Model name. **Required** for OpenAI-compatible endpoints, where no name is portable. |
 | `MINDMAP_ALLOW_PRIVATE_HOSTS` | `false` | Let `url_to_mindmap` reach localhost and private networks. |
 | `MINDMAP_MAX_INPUT_CHARS` | `200000` | Hard cap on characters read from any one input. |
 | `MINDMAP_CLIENT_MAX_CHARS` | `60000` | Cap on the source text returned in `client` mode. |

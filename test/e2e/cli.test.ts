@@ -75,7 +75,7 @@ describe('metadata commands', () => {
       env: { ANTHROPIC_API_KEY: 'placeholder-value', MINDMAP_OUTPUT_DIR: directory },
     });
     expect(withDefault.code).toBe(0);
-    expect(withDefault.stdout).toContain('model claude-sonnet-5 (default)');
+    expect(withDefault.stdout).toContain('model claude-sonnet-5-5 (default)');
 
     const withOverride = await cli(['doctor'], {
       env: {

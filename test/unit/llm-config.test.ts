@@ -82,7 +82,7 @@ describe('describeConfig', () => {
   it('describes the call without the key', () => {
     process.env.ANTHROPIC_API_KEY = PLACEHOLDER;
     const description = describeConfig(resolveLlmConfig());
-    expect(description).toBe('anthropic · claude-sonnet-5 · api.anthropic.com');
+    expect(description).toBe('anthropic · claude-sonnet-5-5 · api.anthropic.com');
     expect(description).not.toContain(PLACEHOLDER);
   });
 });
